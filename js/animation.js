@@ -153,15 +153,42 @@ const Ambient = (() => {
       targets.forEach(t => t.classList.add("is-visible"));
       return;
     }
-    const io = new IntersectionObserver((entries) => {
+
+    const reveal = (entries, obs) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add("is-visible");
-          io.unobserve(entry.target);
+          obs.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.15 });
-    targets.forEach(t => io.observe(t));
+    };
+
+    // threshold: 0.15 means "15% of the element's own area must be
+    // on-screen at once". That's fine for a section shorter than the
+    // viewport, but the 100 Reasons section is many times taller than a
+    // phone screen (100 stacked cards), so the visible fraction of it can
+    // never reach 15% — the intersection ratio maxes out at roughly
+    // viewport-height / element-height. On mobile that ceiling sits well
+    // below 0.15, so this observer simply never fired for it and the
+    // whole section (title included) stayed at opacity:0 forever. That
+    // was the actual "reasons don't render on mobile" bug — the data and
+    // grid were always there, just permanently invisible.
+    //
+    // Fix: give tall elements an achievable threshold instead of a fixed
+    // one. Elements shorter than the viewport keep the original 0.15
+    // behavior (desktop is unaffected); elements taller than the viewport
+    // get threshold: 0 so they reveal as soon as any part is on-screen.
+    const io = new IntersectionObserver(reveal, { threshold: 0.15 });
+    const tallIo = new IntersectionObserver(reveal, { threshold: 0 });
+
+    targets.forEach(t => {
+      const maxReachableRatio = window.innerHeight / t.offsetHeight;
+      if (maxReachableRatio < 0.15) {
+        tallIo.observe(t);
+      } else {
+        io.observe(t);
+      }
+    });
   }
 
   /* ---------------------------------------------------------------
