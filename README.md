@@ -1,9 +1,11 @@
 # My World Is You — Interactive Anniversary Website
 
 A cinematic, three-page anniversary experience: a PIN-locked entrance, a
-scroll-driven anniversary page, and an orbiting "planet of memories" finale.
-Pure HTML, CSS, and vanilla JavaScript — no build step, no frameworks,
-works completely offline.
+scroll-driven anniversary page, and a 3D "planet of memories" finale built
+with Three.js. Pure HTML, CSS, and vanilla JavaScript — no build step, no
+frameworks, no npm. Three.js itself is the one exception: it loads from a
+CDN the first time the Planet Page opens, so that page needs an internet
+connection (everything else works fully offline).
 
 Every piece of personal content lives in **`js/config.js`**. You should
 never need to touch the HTML, CSS, or other JS files to make this yours.
@@ -85,8 +87,9 @@ media: {
   ],
 }
 ```
-These 10 images are automatically duplicated into ~110 orbiting cards
-(controlled by `planet.photoCount`) — you only ever need 10 originals.
+These 10 images are automatically duplicated into ~130 floating photos
+scattered through the 3D memory sphere (controlled by `planet.photoCount`)
+— you only ever need 10 originals.
 
 ### Replace the music
 ```js
@@ -135,19 +138,30 @@ however many reasons you list.
 
 ### Colors and planet behavior
 The `colors` object controls the aurora/glass palette. The `planet`
-object controls how many photo cards orbit, and how large/fast/slow
-their orbits are:
+object controls the 3D memory-sphere scene — how many photos float
+around it, how big/close everything is, and how the double-tap
+cinematic behaves:
 ```js
 planet: {
-  photoCount: 110,
-  minRadiusVW: 18,
-  maxRadiusVW: 46,
-  minDurationSec: 18,
-  maxDurationSec: 60,
+  photoCount: 130,
+  sphereRadius: 15,
+  sphereJitter: 0.6,
+  planetRadius: 5.2,
+  cameraDistance: 34,
+  cameraMinDistance: 16,
+  cameraMaxDistance: 60,
+  autoRotateSpeed: 0.045,
+  bloomStrength: 1.15,
+  bloomRadius: 0.55,
+  bloomThreshold: 0.15,
+  cinematicDuration: 6200,
+  starCount: 900,
 }
 ```
-Lower `photoCount` on older phones if you want extra headroom for
-smooth 60fps orbiting.
+Lower `photoCount` and `starCount` on older phones if you want extra
+headroom for smooth 60fps. The Planet Page automatically renders a
+lighter version on phones already (fewer particles, capped pixel
+ratio) — these numbers are the desktop/high-end baseline.
 
 ---
 
@@ -206,7 +220,7 @@ Vercel dashboard's "Add New Project" → "Import" flow.
 │   ├── style.css         Design tokens, resets, ambient background
 │   ├── pin.css            Loading + PIN screen
 │   ├── home.css           Anniversary page (hero, frame, letter, reasons)
-│   ├── planet.css         Planet page + photo popup modal
+│   ├── planet.css         Planet page (canvas mount, loader) + photo popup modal
 │   ├── animation.css      Shared keyframes
 │   └── responsive.css     Tablet / mobile breakpoints
 ├── js/
@@ -214,10 +228,10 @@ Vercel dashboard's "Add New Project" → "Import" flow.
 │   ├── app.js              Orchestrator: page flow, counter, letter, CTA
 │   ├── pin.js               PIN screen logic
 │   ├── music.js             Crossfade / ducking audio manager
-│   ├── planet.js            Orbit generation + photo modal
+│   ├── planet.js            Three.js memory-sphere scene + photo modal
 │   └── animation.js         Ambient stars/hearts/shooting stars/reveal
 └── assets/
-    ├── photos/            10 source photos, duplicated into orbits
+    ├── photos/            10 source photos, duplicated into the memory sphere
     ├── profile/           1 profile photo
     ├── videos/            1 video
     └── music/             2 tracks (intro + planet)
