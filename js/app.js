@@ -239,6 +239,7 @@ const App = (() => {
   function buildReasonsGrid() {
     const grid = document.getElementById("reasonsGrid");
     const fragment = document.createDocumentFragment();
+    const cards = [];
 
     CONFIG.reasons.forEach((reason, i) => {
       const card = document.createElement("div");
@@ -252,38 +253,65 @@ const App = (() => {
       card.appendChild(num);
       card.appendChild(text);
       fragment.appendChild(card);
+      cards.push(card);
     });
     grid.appendChild(fragment);
 
-    // On small/touch viewports the scroll-triggered reveal was unreliable
-    // (address-bar resizing, bfcache restores, etc. could leave every card
-    // stuck at opacity:0 with nothing ever intersecting) and the whole
-    // section rendered as empty. Mobile just shows the full list right
-    // away instead of waiting on IntersectionObserver. Desktop keeps the
-    // existing scroll-reveal animation untouched.
-    const isMobileViewport = window.matchMedia("(max-width: 600px)").matches;
+    revealReasonsGrid(grid, cards);
+  }
 
-    if (isMobileViewport || !("IntersectionObserver" in window)) {
-      grid.querySelectorAll(".reason-card").forEach(c => c.classList.add("is-visible"));
+  // Staggered "bubble" reveal for the reason cards: triggers once when the
+  // Reasons section enters the viewport, then fades/scales/un-blurs each
+  // card in one after another. Plays once — the observer unobserves itself,
+  // so scrolling back up and down again never replays it.
+  const REASONS_STAGGER_MS = 50;
+
+  function revealReasonsGrid(grid, cards) {
+    const playBubbleReveal = () => {
+      cards.forEach((card, i) => {
+        card.style.transitionDelay = `${i * REASONS_STAGGER_MS}ms`;
+        card.classList.add("is-visible");
+      });
+      // Drop the inline transition-delay / will-change once every card has
+      // finished animating, so they don't linger on 100 elements forever
+      // and interfere with the (much shorter) hover transition.
+      const settleTime = cards.length * REASONS_STAGGER_MS + 700;
+      setTimeout(() => {
+        cards.forEach(card => {
+          card.style.transitionDelay = "";
+          card.style.willChange = "auto";
+        });
+      }, settleTime);
+    };
+
+    if (!("IntersectionObserver" in window)) {
+      playBubbleReveal();
       return;
     }
 
+    // Observe the section itself rather than each card individually: the
+    // section is ~100 cards tall, far taller than any phone screen, so
+    // this needs threshold: 0 (fire as soon as any pixel is visible)
+    // rather than a percentage-of-area threshold — the same issue that
+    // was hiding the whole section on mobile (see animation.js).
+    const section = grid.closest(".reasons-section") || grid;
     const io = new IntersectionObserver((entries) => {
-      entries.forEach((entry, idx) => {
+      entries.forEach(entry => {
         if (entry.isIntersecting) {
-          setTimeout(() => entry.target.classList.add("is-visible"), (idx % 8) * 60);
+          playBubbleReveal();
           io.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" });
-    grid.querySelectorAll(".reason-card").forEach(c => io.observe(c));
+    }, { threshold: 0, rootMargin: "0px 0px -10% 0px" });
+    io.observe(section);
 
-    // Safety net: if the observer never fires for some reason, force
-    // everything visible after a short delay so the section can never
-    // stay empty-looking.
+    // Safety net: guarantee the grid can never end up stuck fully hidden.
     setTimeout(() => {
-      grid.querySelectorAll(".reason-card:not(.is-visible)").forEach(c => c.classList.add("is-visible"));
-    }, 2000);
+      if (cards.some(c => !c.classList.contains("is-visible"))) {
+        io.unobserve(section);
+        playBubbleReveal();
+      }
+    }, 4000);
   }
 
   /* -----------------------------------------------------------------
