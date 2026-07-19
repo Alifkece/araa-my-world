@@ -178,7 +178,7 @@
       <div class="envelope__back"></div>
       <div class="envelope__letter" id="envelopeLetter">
         <h3 class="envelope__heading" id="letterHeading"></h3>
-        <p class="envelope__body" id="letterBody"></p>
+        <div class="envelope__body" id="letterBody"></div>
       </div>
       <div class="envelope__flap"></div>
       <div class="envelope__front"></div>
@@ -221,20 +221,16 @@
   </button>
 
   <div class="planet-titles">
-    <h2 class="planet-title reveal" id="planetTitle"></h2>
-    <p class="planet-subtitle reveal" id="planetSubtitle"></p>
+    <h2 class="planet-title planet-text-reveal" id="planetTitle"></h2>
+    <p class="planet-subtitle planet-text-reveal planet-text-reveal--delay" id="planetSubtitle"></p>
   </div>
 
   <div class="planet-stage" id="planetStage">
-    <div class="planet-stage__orbits" id="orbitField"></div>
-    <div class="planet" id="planetBody">
-      <div class="planet__atmosphere"></div>
-      <div class="planet__surface"></div>
-      <div class="planet__terminator"></div>
-      <div class="planet__clouds"></div>
-      <div class="planet__glow"></div>
-      <div class="planet__ring"></div>
+    <canvas id="planetCanvas" class="planet-stage__canvas"></canvas>
+    <div class="planet-stage__loader" id="planetLoader" aria-hidden="true">
+      <span class="planet-stage__loader-ring"></span>
     </div>
+    <p class="planet-stage__hint" id="planetHint">Drag to explore &middot; double-tap for a moment</p>
   </div>
 
   <button class="sound-toggle" id="soundToggle" aria-label="Toggle music">
@@ -269,6 +265,10 @@
 <script src="js/animation.js"></script>
 <script src="js/music.js"></script>
 <script src="js/pin.js"></script>
+<!-- planet.js lazy-loads Three.js (+ bloom postprocessing addons) from a CDN
+     the first time the person visits the Planet Page, so the initial
+     PIN/anniversary pages stay fast and lightweight. No build step,
+     no npm, no bundler — everything still runs from a plain index.html. -->
 <script src="js/planet.js"></script>
 <script src="js/app.js"></script>
 </body>
