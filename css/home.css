@@ -365,26 +365,10 @@
   line-height: 1.5;
   color: var(--text-primary);
   opacity: 0;
-  transform: translateY(30px) scale(0.75);
-  filter: blur(3px);
-  transition: opacity 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-              filter 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-              border-color 0.3s, background 0.3s;
-  will-change: opacity, transform, filter;
+  transform: translateY(18px);
+  transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out), border-color 0.3s, background 0.3s;
 }
-.reason-card.is-visible {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  filter: blur(0);
-}
-@media (prefers-reduced-motion: reduce) {
-  .reason-card {
-    transform: none;
-    filter: none;
-    transition: opacity 0.4s ease;
-  }
-}
+.reason-card.is-visible { opacity: 1; transform: translateY(0); }
 .reason-card:hover {
   background: rgba(255,255,255,0.06);
   border-color: rgba(79,227,255,0.35);
