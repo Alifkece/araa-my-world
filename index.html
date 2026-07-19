@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover" />
+<title>My World Is You — An Anniversary</title>
+<meta name="description" content="A cinematic interactive anniversary experience." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Marcellus&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/pin.css">
+<link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/planet.css">
+<link rel="stylesheet" href="css/animation.css">
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+<!-- ============================================================
+     SHARED AMBIENT BACKGROUND (persists across all pages)
+     ============================================================ -->
+<div class="ambient" aria-hidden="true">
+  <div class="ambient__stars" id="starField"></div>
+  <div class="ambient__aurora aurora--one"></div>
+  <div class="ambient__aurora aurora--two"></div>
+  <div class="ambient__aurora aurora--three"></div>
+  <div class="ambient__vignette"></div>
+  <div class="ambient__hearts" id="heartField"></div>
+  <div class="ambient__shooting" id="shootingField"></div>
+  <div class="ambient__grain"></div>
+</div>
+
+<!-- ============================================================
+     PAGE 0 — LOADING SCREEN
+     ============================================================ -->
+<section id="loadingScreen" class="loading-screen" aria-label="Loading">
+  <div class="loading-screen__orb">
+    <svg viewBox="0 0 120 120" class="loading-screen__ring">
+      <circle cx="60" cy="60" r="52" class="ring-track"/>
+      <circle cx="60" cy="60" r="52" class="ring-progress"/>
+    </svg>
+    <svg class="loading-screen__spark" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="url(#sparkGrad)"/>
+      <defs>
+        <linearGradient id="sparkGrad" x1="0" y1="0" x2="24" y2="24">
+          <stop offset="0%" stop-color="#4FE3FF"/>
+          <stop offset="100%" stop-color="#8B7CFF"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  </div>
+  <p class="loading-screen__label">crafting your universe<span class="dots"><span>.</span><span>.</span><span>.</span></span></p>
+</section>
+
+<!-- ============================================================
+     PAGE 1 — PIN SCREEN
+     ============================================================ -->
+<section id="pinScreen" class="pin-screen" aria-label="Enter passcode">
+  <div class="pin-card glass">
+    <div class="pin-card__character" id="characterWrap">
+      <div class="pin-card__character-glow"></div>
+      <img id="characterGif" alt="A little companion waiting for you" />
+    </div>
+
+    <h1 class="pin-card__heading" id="pinHeading"></h1>
+    <p class="pin-card__subheading" id="pinSubheading"></p>
+
+    <div class="pin-dots" id="pinDots" role="group" aria-label="PIN entry">
+      <span class="pin-dot" data-index="0"></span>
+      <span class="pin-dot" data-index="1"></span>
+      <span class="pin-dot" data-index="2"></span>
+      <span class="pin-dot" data-index="3"></span>
+    </div>
+
+    <p class="pin-error" id="pinError" role="alert"></p>
+
+    <div class="pin-keypad" id="pinKeypad">
+      <button class="pin-key" data-key="1">1</button>
+      <button class="pin-key" data-key="2">2</button>
+      <button class="pin-key" data-key="3">3</button>
+      <button class="pin-key" data-key="4">4</button>
+      <button class="pin-key" data-key="5">5</button>
+      <button class="pin-key" data-key="6">6</button>
+      <button class="pin-key" data-key="7">7</button>
+      <button class="pin-key" data-key="8">8</button>
+      <button class="pin-key" data-key="9">9</button>
+      <button class="pin-key pin-key--ghost" data-key="hint" aria-label="Hint">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 17.5v.01M12 14c0-2 2-2.2 2-4a2 2 0 1 0-4 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="9.25" stroke="currentColor" stroke-width="1.2" opacity=".4"/></svg>
+      </button>
+      <button class="pin-key" data-key="0">0</button>
+      <button class="pin-key pin-key--ghost" data-key="back" aria-label="Backspace">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 6h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-6-6 6-6Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M13.5 10 L17 13.5 M17 10 L13.5 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <p class="pin-card__footnote">Month &amp; day, four digits</p>
+  </div>
+
+  <!-- confetti canvas -->
+  <canvas id="confettiCanvas" class="confetti-canvas" aria-hidden="true"></canvas>
+</section>
+
+<!-- ============================================================
+     PAGE 2 — ANNIVERSARY PAGE
+     ============================================================ -->
+<main id="annPage" class="ann-page" aria-label="Anniversary" hidden>
+
+  <!-- HERO -->
+  <section class="hero-section">
+    <p class="eyebrow reveal" id="annEyebrow"></p>
+    <h1 class="hero-title reveal" id="annTitle"></h1>
+    <p class="hero-subtitle reveal" id="annSubtitle"></p>
+    <p class="hero-name reveal" id="annName"></p>
+
+    <div class="profile-frame reveal" id="profileFrame">
+      <svg class="profile-frame__ornament" viewBox="0 0 320 320" aria-hidden="true">
+        <defs>
+          <linearGradient id="frameGrad" x1="0" y1="0" x2="320" y2="320" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#4FE3FF"/>
+            <stop offset="50%" stop-color="#8B7CFF"/>
+            <stop offset="100%" stop-color="#E8C88C"/>
+          </linearGradient>
+        </defs>
+        <circle cx="160" cy="160" r="152" fill="none" stroke="url(#frameGrad)" stroke-width="1" opacity="0.55"/>
+        <circle cx="160" cy="160" r="140" fill="none" stroke="url(#frameGrad)" stroke-width="0.6" opacity="0.35" stroke-dasharray="2 6"/>
+        <g class="ornament-spin">
+          <path d="M160 8 L164 22 L160 36 L156 22 Z" fill="url(#frameGrad)" opacity="0.8"/>
+          <path d="M160 312 L164 298 L160 284 L156 298 Z" fill="url(#frameGrad)" opacity="0.8"/>
+          <path d="M8 160 L22 156 L36 160 L22 164 Z" fill="url(#frameGrad)" opacity="0.8"/>
+          <path d="M312 160 L298 164 L284 160 L298 156 Z" fill="url(#frameGrad)" opacity="0.8"/>
+        </g>
+      </svg>
+      <div class="profile-frame__glass"></div>
+      <div class="profile-frame__inner">
+        <img id="profilePhoto" alt="A cherished photo" />
+      </div>
+      <div class="profile-frame__sparkles" id="frameSparkles"></div>
+    </div>
+
+    <div class="counter reveal" id="counter" aria-live="polite">
+      <div class="counter__unit">
+        <span class="counter__value" id="cDays">0</span>
+        <span class="counter__label">days</span>
+      </div>
+      <div class="counter__unit">
+        <span class="counter__value" id="cHours">0</span>
+        <span class="counter__label">hours</span>
+      </div>
+      <div class="counter__unit">
+        <span class="counter__value" id="cMinutes">0</span>
+        <span class="counter__label">minutes</span>
+      </div>
+      <div class="counter__unit">
+        <span class="counter__value" id="cSeconds">0</span>
+        <span class="counter__label">seconds</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIDEO -->
+  <section class="video-section reveal-on-scroll">
+    <p class="section-eyebrow">A moment, replayed</p>
+    <div class="video-player glass" id="videoPlayer">
+      <video id="annVideo" playsinline preload="metadata"></video>
+      <button class="video-player__play" id="videoPlayBtn" aria-label="Play video">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="1" opacity="0.5"/><path d="M10 8.5 L16.5 12 L10 15.5 Z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- LETTER -->
+  <section class="letter-section reveal-on-scroll">
+    <p class="section-eyebrow" id="envelopeLabel"></p>
+    <div class="envelope" id="envelope">
+      <div class="envelope__back"></div>
+      <div class="envelope__letter" id="envelopeLetter">
+        <h3 class="envelope__heading" id="letterHeading"></h3>
+        <p class="envelope__body" id="letterBody"></p>
+      </div>
+      <div class="envelope__flap"></div>
+      <div class="envelope__front"></div>
+      <div class="envelope__seal">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 20.5s-7.9-4.9-10.2-9.4C.4 8 2 4.8 5.3 4.2c2-.4 3.9.5 5 2.2 1.1-1.7 3-2.6 5-2.2 3.3.6 4.9 3.8 3.5 6.9C21.5 15.6 12 20.5 12 20.5Z" fill="currentColor"/></svg>
+      </div>
+    </div>
+    <p class="envelope__hint" id="envelopeHint">Tap the seal to open</p>
+  </section>
+
+  <!-- 100 REASONS -->
+  <section class="reasons-section reveal-on-scroll">
+    <p class="section-eyebrow">One hundred, and counting</p>
+    <h2 class="section-title">100 Reasons Why I Love You</h2>
+    <div class="reasons-grid" id="reasonsGrid"></div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section reveal-on-scroll">
+    <button class="glow-button" id="visitPlanetBtn">
+      <span class="glow-button__ripple"></span>
+      <svg viewBox="0 0 24 24" fill="none" class="glow-button__icon">
+        <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.4"/>
+        <ellipse cx="12" cy="12" rx="10" ry="3.6" stroke="currentColor" stroke-width="1.2" opacity="0.7"/>
+      </svg>
+      <span>Visit Our Planet</span>
+    </button>
+  </section>
+
+</main>
+
+<!-- ============================================================
+     PAGE 3 — PLANET PAGE
+     ============================================================ -->
+<section id="planetPage" class="planet-page" aria-label="Our planet" hidden>
+
+  <button class="planet-page__back" id="planetBackBtn" aria-label="Back">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M15 5 L8 12 L15 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Back</span>
+  </button>
+
+  <div class="planet-titles">
+    <h2 class="planet-title reveal" id="planetTitle"></h2>
+    <p class="planet-subtitle reveal" id="planetSubtitle"></p>
+  </div>
+
+  <div class="planet-stage" id="planetStage">
+    <div class="planet-stage__orbits" id="orbitField"></div>
+    <div class="planet" id="planetBody">
+      <div class="planet__atmosphere"></div>
+      <div class="planet__surface"></div>
+      <div class="planet__terminator"></div>
+      <div class="planet__clouds"></div>
+      <div class="planet__glow"></div>
+      <div class="planet__ring"></div>
+    </div>
+  </div>
+
+  <button class="sound-toggle" id="soundToggle" aria-label="Toggle music">
+    <svg viewBox="0 0 24 24" fill="none" class="sound-toggle__on">
+      <path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/>
+      <path d="M17 8a5 5 0 0 1 0 8M19.5 5.5a9 9 0 0 1 0 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    </svg>
+    <svg viewBox="0 0 24 24" fill="none" class="sound-toggle__off" hidden>
+      <path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/>
+      <path d="M16 9l5 6M21 9l-5 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    </svg>
+  </button>
+</section>
+
+<!-- ============================================================
+     PHOTO POPUP MODAL
+     ============================================================ -->
+<div class="photo-modal" id="photoModal" aria-hidden="true">
+  <div class="photo-modal__backdrop" id="photoModalBackdrop"></div>
+  <div class="photo-modal__card glass">
+    <button class="photo-modal__close" id="photoModalClose" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M6 6 L18 18 M18 6 L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+    <div class="photo-modal__frame">
+      <img id="photoModalImg" alt="A shared memory" />
+    </div>
+    <p class="photo-modal__caption" id="photoModalCaption">A memory worth orbiting forever.</p>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/animation.js"></script>
+<script src="js/music.js"></script>
+<script src="js/pin.js"></script>
+<script src="js/planet.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
