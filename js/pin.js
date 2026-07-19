@@ -56,10 +56,10 @@ const PinScreen = (() => {
     dotsEl.classList.add("is-success");
     Ambient.burstConfetti();
     MusicManager.playIntro();
-    App.unlock();
-    setTimeout(() => {
-      App.goToAnniversaryPage();
-    }, 1100);
+
+setTimeout(() => {
+    App.goToAnniversaryPage();
+}, 1100);
   }
 
   function handleWrong() {
