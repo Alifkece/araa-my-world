@@ -1,0 +1,227 @@
+/* =========================================================================
+   STYLE.CSS — Design tokens, resets, ambient background, shared utilities
+   ========================================================================= */
+
+:root {
+  /* Colors */
+  --bg-deep:     #040613;
+  --bg-navy:     #0A1030;
+  --aurora-blue:   #3D6BFF;
+  --aurora-cyan:   #4FE3FF;
+  --aurora-violet: #8B7CFF;
+  --gold:          #E8C88C;
+  --text-primary:  #F5F7FF;
+  --text-muted:    #A9B2D6;
+
+  --glass-fill:   rgba(18, 24, 56, 0.45);
+  --glass-fill-2: rgba(30, 38, 78, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-blur: 22px;
+
+  /* Type */
+  --font-display: 'Marcellus', 'Cormorant Garamond', serif;
+  --font-letter: 'Cormorant Garamond', serif;
+  --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+
+  color-scheme: dark;
+}
+
+* , *::before, *::after { box-sizing: border-box; }
+
+/* The [hidden] attribute must always fully remove an element from layout,
+   even when a component's own class also sets display:flex/grid (which
+   otherwise ties in specificity with the browser's default [hidden] rule
+   and can win the cascade). Without this, a hidden section can still take
+   up its full height in the page flow. */
+[hidden] { display: none !important; }
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100svh; /* mobile browsers include the address-bar in 100vh, which leaves dead scrollable space at the bottom; svh accounts for the smallest real viewport */
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent; /* no gray flash on tap, Android Chrome */
+}
+
+button, a, .planet-stage__canvas, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+img { max-width: 100%; display: block; }
+button { font-family: inherit; cursor: pointer; }
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--aurora-cyan);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+::selection { background: rgba(79, 227, 255, 0.28); color: #fff; }
+
+/* -------------------------------------------------------------------------
+   GLASS UTILITY
+   ------------------------------------------------------------------- */
+.glass {
+  background: linear-gradient(160deg, var(--glass-fill), var(--glass-fill-2));
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  box-shadow:
+    0 8px 40px rgba(3, 6, 20, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* -------------------------------------------------------------------------
+   AMBIENT BACKGROUND (fixed, shared across all sections)
+   ------------------------------------------------------------------- */
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 120% 90% at 50% -10%, rgba(61, 107, 255, 0.16), transparent 60%),
+    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-navy) 55%, var(--bg-deep) 100%);
+}
+
+.ambient__stars {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+}
+
+.ambient__aurora {
+  position: absolute;
+  width: 140vw;
+  height: 60vh;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  mix-blend-mode: screen;
+  will-change: transform;
+}
+.aurora--one {
+  top: -18vh; left: -20vw;
+  background: radial-gradient(closest-side, var(--aurora-blue), transparent 70%);
+  animation: auroraDrift1 26s ease-in-out infinite;
+}
+.aurora--two {
+  top: 30vh; right: -30vw;
+  background: radial-gradient(closest-side, var(--aurora-violet), transparent 70%);
+  animation: auroraDrift2 32s ease-in-out infinite;
+}
+.aurora--three {
+  bottom: -25vh; left: 10vw;
+  background: radial-gradient(closest-side, var(--aurora-cyan), transparent 70%);
+  opacity: 0.22;
+  animation: auroraDrift3 38s ease-in-out infinite;
+}
+
+.ambient__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 90% 80% at 50% 50%, transparent 40%, rgba(2, 3, 10, 0.65) 100%);
+}
+
+.ambient__grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+.ambient__hearts, .ambient__shooting {
+  position: absolute;
+  inset: 0;
+}
+
+/* generic floating heart used by JS-injected elements */
+.floating-heart {
+  position: absolute;
+  bottom: -5vh;
+  opacity: 0;
+  color: var(--aurora-cyan);
+  animation-name: heartRise;
+  animation-timing-function: ease-in;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+.floating-heart svg { width: 100%; height: 100%; display: block; }
+
+.shooting-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
+  opacity: 0;
+}
+.shooting-star::before {
+  content: "";
+  position: absolute;
+  top: 50%; right: 0;
+  width: 120px; height: 1px;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, rgba(255,255,255,0.9), transparent);
+}
+
+/* -------------------------------------------------------------------------
+   SHARED TYPE HELPERS
+   ------------------------------------------------------------------- */
+.eyebrow, .section-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+  text-align: center;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
+  text-align: center;
+  color: var(--text-primary);
+  margin: 0.4em 0 1.4em;
+  letter-spacing: 0.01em;
+}
+
+/* -------------------------------------------------------------------------
+   SCROLLBAR (subtle)
+   ------------------------------------------------------------------- */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--aurora-blue), var(--aurora-violet));
+  border-radius: 10px;
+  border: 2px solid var(--bg-deep);
+}

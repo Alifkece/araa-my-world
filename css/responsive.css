@@ -1,0 +1,60 @@
+/* =========================================================================
+   RESPONSIVE.CSS — Tablet / mobile adjustments
+   ========================================================================= */
+
+/* Tablet */
+@media (max-width: 900px) {
+  .reasons-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .pin-card { padding: 32px 20px 26px; border-radius: 22px; }
+  .pin-keypad { gap: 10px; }
+  .pin-key { font-size: 1rem; }
+
+  .hero-section { padding-top: 80px; }
+  .counter { gap: 10px; }
+  .counter__unit { min-width: 58px; padding: 10px 6px; }
+  .counter__value { font-size: 1.3rem; }
+
+  .video-player { border-radius: 16px; }
+  .video-player__play svg { width: 56px; height: 56px; }
+
+  .envelope { height: 260px; }
+  .envelope__letter { padding: 20px 16px; }
+  .envelope__body { font-size: 0.98rem; }
+
+  .reasons-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .reason-card { padding: 16px 14px 14px; font-size: 0.85rem; }
+
+  .glow-button { padding: 15px 28px; font-size: 0.92rem; }
+
+  .planet-page {
+    height: 100vh;
+    height: 100svh; /* exact fit on mobile — no leftover blank space below the fold */
+    padding: 72px 0 16px;
+    overflow: hidden;
+  }
+  .planet-page__back { top: 14px; left: 14px; padding: 8px 14px 8px 12px; }
+  .planet-titles { margin-bottom: 8px; }
+  .planet-stage { min-height: 0; }
+  .planet-stage__hint { bottom: 24px; font-size: 0.7rem; padding: 7px 14px; }
+
+  .photo-modal__card { padding: 14px; border-radius: 18px; }
+}
+
+/* Small phones */
+@media (max-width: 380px) {
+  .reasons-grid { grid-template-columns: 1fr; }
+  .pin-keypad { gap: 8px; }
+}
+
+/* Landscape phones — keep planet stage usable */
+@media (max-height: 480px) and (orientation: landscape) {
+  .planet-page { padding-top: 70px; }
+  .planet-stage { min-height: 40vh; }
+  .hero-section { min-height: auto; padding: 90px 20px 40px; }
+}
