@@ -8,7 +8,6 @@
 const App = (() => {
 
   let counterInterval = null;
-  const AUTH_KEY = "annUnlocked";
 
   /* -----------------------------------------------------------------
      PIN / HISTORY GUARD
@@ -19,62 +18,9 @@ const App = (() => {
      when the person comes back — including an already-unlocked
      anniversary page — which bypassed the PIN entirely. This adds a
      real history entry on unlock and re-locks on any back/forward
-     navigation or bfcache restore that isn't that unlocked entry.
+     navigation or bfcache restore that isn't that unlocked entry
      ----------------------------------------------------------------- */
-  function isAuthenticated() {
-    try { return sessionStorage.getItem(AUTH_KEY) === "1"; } catch (e) { return false; }
-  }
-
-  function markAuthenticated() {
-    try { sessionStorage.setItem(AUTH_KEY, "1"); } catch (e) {}
-  }
-
-  function relockToPinScreen() {
-    document.getElementById("annPage").hidden = true;
-    document.getElementById("planetPage").hidden = true;
-    document.getElementById("pinScreen").style.display = "";
-    PlanetPage.leave();
-    window.scrollTo(0, 0);
-    // Note: the session flag is intentionally NOT cleared here — it just
-    // means "the correct PIN was entered at least once in this tab".
-    // Re-locking on Back always hides the content regardless of the flag;
-    // the flag only lets a subsequent Forward (within the same tab/session)
-    // restore the view instead of demanding the PIN again.
-  }
-
-  function restoreUnlockedView() {
-    document.getElementById("pinScreen").style.display = "none";
-    document.getElementById("annPage").hidden = false;
-    document.getElementById("planetPage").hidden = true;
-  }
-
-  function unlock() {
-    markAuthenticated();
-    try { history.pushState({ annStep: "unlocked" }, ""); } catch (e) {}
-  }
-
-  function initHistoryGuard() {
-    try {
-      history.replaceState({ annStep: isAuthenticated() ? "unlocked" : "locked" }, "");
-    } catch (e) {}
-
-    window.addEventListener("popstate", (e) => {
-      const step = e.state && e.state.annStep;
-      if (step === "unlocked" && isAuthenticated()) {
-        restoreUnlockedView();
-      } else {
-        relockToPinScreen();
-      }
-    });
-
-    // Some mobile browsers restore a cached page (including the DOM as it
-    // looked when the person left) instead of re-running this script —
-    // re-check real auth state whenever that happens.
-    window.addEventListener("pageshow", (e) => {
-      if (e.persisted && !isAuthenticated()) relockToPinScreen();
-    });
-  }
-
+  
   /* -----------------------------------------------------------------
      LOADING SCREEN
      ----------------------------------------------------------------- */
@@ -330,13 +276,6 @@ const App = (() => {
 
     PinScreen.init();
     PlanetPage.init();
-    initHistoryGuard();
-
-    if (isAuthenticated()) {
-      document.getElementById("pinScreen").style.display = "none";
-      document.getElementById("annPage").hidden = false;
-      Ambient.startScrollReveal();
-    }
 
     // simulate a brief, elegant loading sequence
     window.addEventListener("load", () => {
@@ -348,5 +287,8 @@ const App = (() => {
 
   document.addEventListener("DOMContentLoaded", init);
 
-  return { goToAnniversaryPage, goToPlanetPage, unlock };
+  return {
+  goToAnniversaryPage,
+  goToPlanetPage
+};
 })();
