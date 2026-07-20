@@ -260,10 +260,10 @@ const App = (() => {
     revealReasonsGrid(grid, cards);
   }
 
-  // Staggered "bubble" reveal for the reason cards: triggers once when the
-  // Reasons section enters the viewport, then fades/scales/un-blurs each
-  // card in one after another. Plays once — the observer unobserves itself,
-  // so scrolling back up and down again never replays it.
+  // Animasi "bubble" bertahap buat tiap card: trigger sekali pas section
+  // Reasons masuk viewport, terus card muncul satu-satu berurutan.
+  // Cuma main sekali — observer-nya unobserve diri sendiri, jadi scroll
+  // naik-turun lagi gak akan replay animasinya.
   const REASONS_STAGGER_MS = 50;
 
   function revealReasonsGrid(grid, cards) {
@@ -272,9 +272,6 @@ const App = (() => {
         card.style.transitionDelay = `${i * REASONS_STAGGER_MS}ms`;
         card.classList.add("is-visible");
       });
-      // Drop the inline transition-delay / will-change once every card has
-      // finished animating, so they don't linger on 100 elements forever
-      // and interfere with the (much shorter) hover transition.
       const settleTime = cards.length * REASONS_STAGGER_MS + 700;
       setTimeout(() => {
         cards.forEach(card => {
@@ -289,11 +286,6 @@ const App = (() => {
       return;
     }
 
-    // Observe the section itself rather than each card individually: the
-    // section is ~100 cards tall, far taller than any phone screen, so
-    // this needs threshold: 0 (fire as soon as any pixel is visible)
-    // rather than a percentage-of-area threshold — the same issue that
-    // was hiding the whole section on mobile (see animation.js).
     const section = grid.closest(".reasons-section") || grid;
     const io = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -305,7 +297,6 @@ const App = (() => {
     }, { threshold: 0, rootMargin: "0px 0px -10% 0px" });
     io.observe(section);
 
-    // Safety net: guarantee the grid can never end up stuck fully hidden.
     setTimeout(() => {
       if (cards.some(c => !c.classList.contains("is-visible"))) {
         io.unobserve(section);
