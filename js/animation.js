@@ -163,21 +163,20 @@ const Ambient = (() => {
       });
     };
 
-    // threshold: 0.15 means "15% of the element's own area must be
-    // on-screen at once". That's fine for a section shorter than the
-    // viewport, but the 100 Reasons section is many times taller than a
-    // phone screen (100 stacked cards), so the visible fraction of it can
-    // never reach 15% — the intersection ratio maxes out at roughly
-    // viewport-height / element-height. On mobile that ceiling sits well
-    // below 0.15, so this observer simply never fired for it and the
-    // whole section (title included) stayed at opacity:0 forever. That
-    // was the actual "reasons don't render on mobile" bug — the data and
-    // grid were always there, just permanently invisible.
+    // threshold: 0.15 artinya "15% luas elemen harus kelihatan sekaligus".
+    // Itu oke buat section pendek, tapi section 100 Reasons tingginya
+    // berkali lipat dari layar HP (isinya ~99 card ditumpuk), jadi rasio
+    // yang bisa dicapai gak akan pernah nyampe 15% — mentoknya cuma sekitar
+    // tinggi-layar / tinggi-elemen. Di HP itu jauh di bawah 0.15, jadi
+    // observer ini gak pernah nyala buat section itu dan seluruh section
+    // (judul + grid) nyangkut opacity:0 selamanya. Ini penyebab asli
+    // "100 reasons gak keliatan di HP" — data & grid-nya selalu ada,
+    // cuma permanently invisible.
     //
-    // Fix: give tall elements an achievable threshold instead of a fixed
-    // one. Elements shorter than the viewport keep the original 0.15
-    // behavior (desktop is unaffected); elements taller than the viewport
-    // get threshold: 0 so they reveal as soon as any part is on-screen.
+    // Fix: kasih threshold yang achievable sesuai tinggi elemen. Elemen
+    // yang lebih pendek dari viewport tetap pakai 0.15 (desktop gak
+    // berubah); elemen yang lebih tinggi dari viewport pakai threshold: 0
+    // supaya nyala begitu ada sepixel aja yang kelihatan.
     const io = new IntersectionObserver(reveal, { threshold: 0.15 });
     const tallIo = new IntersectionObserver(reveal, { threshold: 0 });
 
