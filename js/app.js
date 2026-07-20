@@ -8,7 +8,6 @@
 const App = (() => {
 
   let counterInterval = null;
-  const AUTH_KEY = "annUnlocked";
 
   /* -----------------------------------------------------------------
      PIN / HISTORY GUARD
@@ -20,15 +19,28 @@ const App = (() => {
      anniversary page — which bypassed the PIN entirely. This adds a
      real history entry on unlock and re-locks on any back/forward
      navigation or bfcache restore that isn't that unlocked entry.
+
+     "Unlocked" is intentionally kept as a plain in-memory flag, NOT
+     sessionStorage. sessionStorage is meant to be cleared when a tab is
+     closed, but mobile browsers frequently restore a previous session
+     (after being swiped away, or the OS reclaiming memory) by reloading
+     the tab with its sessionStorage intact — that's what was skipping
+     the PIN screen on a fresh app open. A plain JS variable can't
+     survive that: any real reload/relaunch re-runs this script from
+     scratch and resets it to false, so the PIN is asked again every
+     time the site is actually (re)opened. It still survives in-app
+     Back/Forward (popstate) and bfcache restores within the same
+     browsing session, since those don't re-run this script.
      ----------------------------------------------------------------- */
+  let unlocked = false;
+
   function isAuthenticated() {
-    try { return sessionStorage.getItem(AUTH_KEY) === "1"; } catch (e) { return false; }
+    return unlocked;
   }
 
   function markAuthenticated() {
-    try { sessionStorage.setItem(AUTH_KEY, "1"); } catch (e) {}
+    unlocked = true;
   }
-
   function relockToPinScreen() {
     document.getElementById("annPage").hidden = true;
     document.getElementById("planetPage").hidden = true;
